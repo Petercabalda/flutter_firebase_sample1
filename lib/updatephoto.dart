@@ -27,43 +27,14 @@ class _UpdatePhotoState extends State<UpdatePhoto> {
     });
   }
 
-  Future uploadFile(context) async {
-    showLoaderDialog(context);
-
-    final path = 'images/${generateRandomString(5)}-${pickedFile!.name}';
-    final file = File(pickedFile!.path!);
-    final ref = FirebaseStorage.instance.ref().child(path);
-
-    setState(() {
-      uploadTask = ref.putFile(file);
-    });
-
-    final snapshot = await uploadTask!.whenComplete(() => {});
-    final urlDownload = await snapshot.ref.getDownloadURL();
-    print('Download Link: $urlDownload');
-
-    updateDatabase(urlDownload, context);
-
-    // setState(() {
-    //   urlFile = urlDownload;
-    //   uploadTask = null;
-    // });
+  @override
+  void initState() {
+    super.initState();
   }
 
-  Future updateDatabase(urlDownload, context) async {
-    final docUser = FirebaseFirestore.instance
-        .collection('Employee')
-        .doc('AVtShPPuaYa40BfUnENQBJymlhI3');
-
-    await docUser.update({
-      'image': urlDownload,
-    }).then((value) {
-      showAlert(context, 'Success', 'Image Update Success');
-    });
-
-    setState(() {
-      pickedFile = null;
-    });
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Widget imgExist() => Image.file(
@@ -78,21 +49,53 @@ class _UpdatePhotoState extends State<UpdatePhoto> {
         fit: BoxFit.cover,
       );
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   String generateRandomString(int len) {
     var r = Random();
-    const _char =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMnNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _char[r.nextInt(_char.length)]).join();
+    const _chars =
+        "AaBaCaDaEaFaGaHaIaJaKaLaMaNaOaPaQaRaSaTaUaVaWaXaYaZaA1B1C1D1E1F1G1H1I1J1K1L1M1N1O1P1Q1R1S1T1U1V1W1X1Y1Z1";
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+        .join();
+  }
+
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: Row(
+        children: [
+          const CircularProgressIndicator(),
+          Container(
+            margin: const EdgeInsets.only(left: 7),
+            child: const Text("Uploading ..."),
+          )
+        ],
+      ),
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future uploadFile(context) async {
+    showLoaderDialog(context);
+
+    final path = 'images/${'${generateRandomString(5)}-${pickedFile!.name}'}';
+    final file = File(pickedFile!.path!);
+    final ref = FirebaseStorage.instance.ref().child(path);
+    setState(() {
+      uploadTask = ref.putFile(file);
+    });
+    final snapshot = await uploadTask!.whenComplete(() => {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    print('Download Link: $urlDownload');
+
+    updateDatabase(urlDownload, context);
+    // setState(() {
+    //   urlfile = urlDownload;
+    //   uploadTask = null;
+    // });
   }
 
   showAlertDialogUpload(BuildContext context) {
@@ -111,26 +114,25 @@ class _UpdatePhotoState extends State<UpdatePhoto> {
     );
 
     AlertDialog alert = AlertDialog(
-        title: const Text('Question'),
-        content: const Text('Are you sure want to upload this image?'),
-        actions: [
-          cancelButton,
-          continueButton,
-        ]);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
+      title: const Text('Question'),
+      content: const Text('Are you sure want to upload this image?'),
+      actions: [cancelButton, continueButton],
     );
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        });
   }
 
   showAlert(BuildContext context, String title, String msg) {
     Widget continueButton = TextButton(
       onPressed: () {
-        Navigator.pop(context);
-        if (title == "Success") if (urlFile == '') urlFile = "-";
-        Navigator.of(context).pop(Photo(image: urlFile));
+        Navigator.of(context).pop();
+        if (title == "Success") {
+          if (urlFile == '') urlFile = "-";
+          Navigator.of(context).pop(Photo(image: urlFile));
+        }
       },
       child: const Text('Ok'),
     );
@@ -143,27 +145,6 @@ class _UpdatePhotoState extends State<UpdatePhoto> {
       ],
     );
 
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  showLoaderDialog(BuildContext context) {
-    AlertDialog alert = AlertDialog(
-      content: Row(
-        children: [
-          const CircularProgressIndicator(),
-          Container(
-            margin: const EdgeInsets.only(left: 7),
-            child: const Text("Uploading ..."),
-          ),
-        ],
-      ),
-    );
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -208,12 +189,26 @@ class _UpdatePhotoState extends State<UpdatePhoto> {
         },
       );
 
+  Future updateDatabase(urlDownload, context) async {
+    final docUser = FirebaseFirestore.instance
+        .collection('Employee')
+        .doc('UpPuDCQkqk51uPNLmChn');
+
+    await docUser.update({
+      'image': urlDownload,
+    }).then((value) => showAlert(context, 'Success', 'Image Update Success!'));
+
+    setState(() {
+      pickedFile = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upload Photo'),
         elevation: 0,
+        title: const Text('Upload Photo'),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);

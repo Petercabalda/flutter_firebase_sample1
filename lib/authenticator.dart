@@ -26,9 +26,9 @@ class _AuthenticatorState extends State<Authenticator> {
               child: Text('Something went wrong!'),
             );
           } else if (snapshot.hasData) {
-            return const Page1();
+            return Page1();
           } else {
-            return const Login();
+            return Login();
           }
         },
       ),

@@ -15,14 +15,6 @@ class _LoginState extends State<Login> {
   late String errormessage;
   late bool isError;
 
-  gotoRegister() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const Register(),
-      ),
-    );
-  }
-
   @override
   void initState() {
     errormessage = "This is an error";
@@ -111,6 +103,12 @@ class _LoginState extends State<Login> {
     letterSpacing: 2,
     fontSize: 38,
   );
+
+  gotoRegister() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => Register()),
+    );
+  }
 
   Future checkLogin(username, password) async {
     showDialog(
